@@ -1,27 +1,29 @@
 import json
 import os
-from typing import List, Dict, Optional, Any
+from typing import Any, Dict, List, Optional
+
 from .storage_abstract import StorageAbstract
+
 
 class JSONSaver(StorageAbstract):
     """JSON-коннектор (наследует AbstractStorage)."""
 
-    def __init__(self, file_name: str = 'data/vacancies.json') -> None:
+    def __init__(self, file_name: str = "data/vacancies.json") -> None:
         self.__file_name = file_name
 
     def __load(self) -> List[Dict]:
         if os.path.exists(self.__file_name):
-            with open(self.__file_name, 'r', encoding='utf-8') as f:
+            with open(self.__file_name, "r", encoding="utf-8") as f:
                 return json.load(f)
         return []
 
     def __save(self, data: List[Dict]) -> None:
-        with open(self.__file_name, 'w', encoding='utf-8') as f:
+        with open(self.__file_name, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
 
     def add_vacancy(self, vacancy: Dict) -> None:
         data = self.__load()
-        if not any(v['id'] == vacancy['id'] for v in data):  # Нет дубликатов по ID
+        if not any(v["id"] == vacancy["id"] for v in data):  # Нет дубликатов по ID
             data.append(vacancy)
         self.__save(data)
 
@@ -33,7 +35,7 @@ class JSONSaver(StorageAbstract):
 
     def delete_vacancy(self, vacancy: Dict) -> None:
         data = self.__load()
-        data = [v for v in data if v['id'] != vacancy['id']]
+        data = [v for v in data if v["id"] != vacancy["id"]]
         self.__save(data)
 
     # Заглушки для других

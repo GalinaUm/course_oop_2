@@ -1,8 +1,9 @@
-from http.client import responses
+from typing import Dict, List
 
 import requests
-from typing import List, Dict
+
 from .api_abstract import AbstractAPI
+
 
 class HeadHunterApi(AbstractAPI):
     """
@@ -16,9 +17,13 @@ class HeadHunterApi(AbstractAPI):
     def __private_connect(self) -> None:
         """Приватный метод проверки подключения (запрос к словарям)."""
         try:
-            response = requests.get("https://api.hh.ru/dictionaries", headers=self.__headers)
+            response = requests.get(
+                "https://api.hh.ru/dictionaries", headers=self.__headers
+            )
             if response.status_code != 200:
-                raise ConnectionError(f"HH API unavailable: status {response.status_code}")
+                raise ConnectionError(
+                    f"HH API unavailable: status {response.status_code}"
+                )
         except requests.RequestException as e:
             raise ConnectionError(f"Connection error: {str(e)}")
 
@@ -26,21 +31,17 @@ class HeadHunterApi(AbstractAPI):
         """Публичный метод подключения."""
         self.__private_connect()
 
-    def get_vacancies(self, keyword: str, per_page: int=100) -> List[Dict]:
+    def get_vacancies(self, keyword: str, per_page: int = 100) -> List[Dict]:
         """Получение вакансий с проверкой подключения."""
         self.connect()
         params = {
             "text": keyword,
             "area": 113,
             "per_page": per_page,
-            "only_with_salary": True
+            "only_with_salary": True,
         }
 
         response = requests.get(self.__base_url, params=params, headers=self.__headers)
         if response.status_code != 200:
             raise ValueError(f"Request failed: {response.status_code}")
         return response.json()["items"]
-
-
-
-
